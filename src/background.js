@@ -134,3 +134,7 @@ ipcMain.on('tcpServerClose', function(e) {
   }
   server.unref()
 })
+
+ipcMain.on('tcpClinet', function(e, ip, port) {
+  console.log(ip, port)
+})
