@@ -1,10 +1,9 @@
 <template>
-  <v-navigation-drawer main v-model="drawer" :mini-variant.sync="mini" permanent>
+  <v-navigation-drawer app v-model="drawer">
      <!-- 제목 -->
     <v-list-item>
-      <v-list-item-content>
+      <v-list-item-content class='main-title'>
         <v-list-item-title class="title">Comm App</v-list-item-title>
-        <v-list-item-subtitle>Comm Test Tool</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
     <v-divider/>
@@ -12,7 +11,7 @@
     <!-- 리스트 시작 -->
     <v-list dense>
       <!-- 메인 아이템 -->
-      <v-list-group v-for="(item, i) in items" :key= "i" v-model="item.active" :prepend-icon="item.icon" no-action>
+      <v-list-group v-for="(item, i) in items" :key="i" :prepend-icon="item.icon" sub-group>
         <template v-slot:activator>    
           <v-list-item-content>
             <v-list-item-title>
@@ -75,7 +74,7 @@ export default {
           // console.log(this.items[0])
       }),
       this.$eventBus.$on('drawerMenu', () => {
-        this.mini = !this.mini
+        this.drawer = !this.drawer
       })
     },
   data () {
@@ -167,4 +166,8 @@ export default {
   .v-text-field input{font-size: 0.8em;}
   .v-text-field label{font-size: 0.8em;}
   .v-select__selections{font-size: .8em;}
+  .main-title {
+    background-color: none;
+    padding: 0px;
+    margin: 0px;}
 </style>

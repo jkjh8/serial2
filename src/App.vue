@@ -1,15 +1,15 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="primary" dark flat height=49px>
       <v-app-bar-nav-icon @click="drawer()"/>
-      <v-toolbar-title>Page Title</v-toolbar-title>
       <v-spacer/>
       <v-icon v-if="online" color="green">mdi-wifi</v-icon>
       <v-icon v-else color="red">mdi-wifi-off</v-icon>
     </v-app-bar>
 
+    <site-menu/>
+
     <v-main>
-      <site-menu/>
       <HelloWorld/>
     </v-main>
 
