@@ -28,7 +28,7 @@
 </template>
 
 <script>
-// import { eventBus } from 'main.js';
+const ipcRenderer = window.require('electron').ipcRenderer;
 import SiteMenu from './components/Menu';
 import HelloWorld from './components/HelloWorld';
 import SiteFooter from './components/Footer';
@@ -50,17 +50,41 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('goOnlineValue', (id, v1,v2) => {
-        console.log("main recv "+id+','+v1+v2)
+    this.$eventBus.$on('goOnlineValue', (id, v1, v2, status) => {
+        console.log("main recv "+id+','+v1+','+v2+','+status)
+        if (status) {
+          switch(id) {
+            case 0:
+              //
+              break;
+            case 1:
+              ipcRenderer.send('tcpServerStart', v2)
+              break;
+          }
+        }
+        if (!status) {
+          switch(id) {
+            case 0:
+              //
+              break;
+            case 1:
+              ipcRenderer.send('tcpServerClose')
+              break;
+          }
+        }
     }),
-
     this.$eventBus.$on('snackBarAct', text => {
       this.snackbarText = text
       this.snackbar = true
     }),
-
     this.$eventBus.$on('sendString', text => {
       console.log('main recv = '+text)
+    }),
+
+    ipcRenderer.on('onConnect', function(e, text) {
+      console.log(text)
+      this.snackbarText = text
+      this.snackbar = true
     })
   },
   methods: {

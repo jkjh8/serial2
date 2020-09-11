@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app v-model="drawer" >
+  <v-navigation-drawer app v-model="drawer" fixed permanent>
      <!-- 제목 -->
     <v-list-item>
       <v-list-item-content class='main-title'>
@@ -54,13 +54,14 @@ export default {
   methods: {
     goOnline: function (id) {
       let v1 = commValue[id][0]; let v2 = commValue[id][1]
-      if (v1===''||v2===''||v1===undefined||v2===undefined||v1===null||v2===null) {  
-        this.$eventBus.$emit('snackBarAct', "error");
-        this.items[id].value = false;
-        console.log(this.items[id])
+      if (v1===''||v2===''||v1===undefined||v2===undefined||v1===null||v2===null) {
+        if (this.value === true) {
+          this.$eventBus.$emit('snackBarAct', "error");
+          this.items[id].value = false;
+        }
       }
       else {
-        this.$eventBus.$emit('goOnlineValue', id, v1, v2)
+        this.$eventBus.$emit('goOnlineValue', id, v1, v2, this.value)
       }
     },
 

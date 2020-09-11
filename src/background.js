@@ -1,9 +1,10 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain, Menu} from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import { Socket } from 'dgram'
+// import { PythonShell } from 'python-shell'
+// import { Socket } from 'dgram'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const net = require('net')
@@ -107,9 +108,10 @@ connectedSocketClient.broadcast = function (text, except) {
 // TCP Server
 const server = net.createServer (function (Client) {
   connectedSocketClient.add(Client)
+  console.log('Client Connect: %s:%s',Client.remoteAddress, Client.remotePort);
 
   Client.on('data', function (data) {
-    console.log('Tcp Server Recv Data = ' + data)
+    console.log('Tcp Server Recv Data %d: %s', Client.remotePort,data.toString());
     //win.webContents.send('tcpServer', data)
   })
   Client.on('close', function() {
@@ -119,20 +121,29 @@ const server = net.createServer (function (Client) {
 
 server.on('error', function(err) {
   // Tcp server Error Report
-  console.log('tcp server err = ' + err)
+  console.log('tcp server err = ' + err);
 })
 
 // func tunnel Tcp Server Start
-ipcMain.on('tcpServerStart', function(e, item, ){
-    server.listen(item)
+ipcMain.on('tcpServerStart', function(event, netPort) {
+    server.listen(netPort, function() {
+      console.log('Server listening: '+ JSON.stringify(server.address()));
+      server.on('close', function(){
+        console.log("Server Close");
+      })
+      server.on('error', function(err){
+        console.log('Server Error: ',JSON.stringify(err));
+      })
+    })
+    
 })
 
 // func tunnel Tcp Server stop
-ipcMain.on('tcpServerClose', function(e) {
-  for (let i in connectedSocketClient) {
-    connectedSocketClient[i].destroy()
+ipcMain.on('tcpServerClose', function(event) {
+  server.close()
+  for (const socket of connectedSocketClient.values()) {
+    socket.destroy();
   }
-  server.unref()
 })
 
 ipcMain.on('tcpClinet', function(e, ip, port) {
