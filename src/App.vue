@@ -50,12 +50,17 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('goOnlineValue', (id, value) => {
-        console.log("main recv "+id+','+value)
+    this.$eventBus.$on('goOnlineValue', (id, v1,v2) => {
+        console.log("main recv "+id+','+v1+v2)
     }),
+
     this.$eventBus.$on('snackBarAct', text => {
       this.snackbarText = text
       this.snackbar = true
+    }),
+
+    this.$eventBus.$on('sendString', text => {
+      console.log('main recv = '+text)
     })
   },
   methods: {

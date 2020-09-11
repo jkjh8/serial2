@@ -1,9 +1,9 @@
 <template>
-  <v-navigation-drawer app v-model="drawer">
+  <v-navigation-drawer app v-model="drawer" >
      <!-- 제목 -->
     <v-list-item>
       <v-list-item-content class='main-title'>
-        <v-list-item-title class="title">Comm App</v-list-item-title>
+        <v-list-item-title class="title">Connect Setup</v-list-item-title>
       </v-list-item-content>
     </v-list-item>
     <v-divider/>
@@ -60,7 +60,7 @@ export default {
         console.log(this.items[id])
       }
       else {
-        this.$eventBus.$emit('goOnlineValue', id)
+        this.$eventBus.$emit('goOnlineValue', id, v1, v2)
       }
     },
 
