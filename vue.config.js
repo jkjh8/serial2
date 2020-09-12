@@ -1,5 +1,4 @@
 const path = require('path')
-
 module.exports = {
   "transpileDependencies": [
     "vuetify"
@@ -8,6 +7,17 @@ module.exports = {
     const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
     types.forEach(type => addStyleResource(config.module.rule('stylus').oneOf(type)))
   },
+  pluginOptions: {
+    electronBuilder:{
+      builderOptions: {
+        extraResources :{
+          "from": "./src/py/",
+          "to": "py",
+          "filter": ["**"]  
+        }
+      }
+    }
+  }
 }
 
 function addStyleResource (rule) {

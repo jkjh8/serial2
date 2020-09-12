@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark flat height=49px>
+    <v-app-bar app class="primary" dark flat height=49px>
       <v-app-bar-nav-icon @click="drawer()"/>
       <v-spacer/>
       <v-icon v-if="online" color="green">mdi-wifi</v-icon>
@@ -15,14 +15,20 @@
 
     <site-footer/>
 
-    <v-snackbar v-model="snackbar" :timeout="snackbarTimeout">
-      {{ snackbarText }}
+    <v-snackbar :color="snackbarclass" v-model="snackbar" :timeout="timeout" rounded="pill" dark>
+      {{ snackbartext }}
+
       <template v-slot:action="{ attrs }">
-        <v-btn color="parmary" text v-bind="attrs" @click="snackbar = false" >
+        <v-btn
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
           Close
         </v-btn>
       </template>
     </v-snackbar>
+
 
   </v-app>
 </template>
@@ -45,8 +51,10 @@ export default {
     return {
       online: false,
       snackbar: false,
-      snackbarText: '',
-      snackbarTimeout: 3000,
+      snackbarclass: "primary",
+      snackbartext: '',
+      timeout: 3000
+
     }
   },
   mounted() {
@@ -74,7 +82,7 @@ export default {
         }
     }),
     this.$eventBus.$on('snackBarAct', text => {
-      this.snackbarText = text
+      this.snackbarOpen(text, "error")
       this.snackbar = true
     }),
     this.$eventBus.$on('sendString', text => {
@@ -83,13 +91,17 @@ export default {
 
     ipcRenderer.on('onConnect', function(e, text) {
       console.log(text)
-      this.snackbarText = text
+      this.snackbarOpen(text, "primary")
       this.snackbar = true
     })
   },
   methods: {
     drawer: function () {
       this.$eventBus.$emit('drawerMenu')
+    },
+    snackbarOpen: function(text, putClassName) {
+      this.snackbarclass = putClassName
+      this.snackbartext = text
     }
   }
 }

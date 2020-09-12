@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app v-model="drawer" fixed permanent>
+  <v-navigation-drawer app v-model="drawer" fixed >
      <!-- 제목 -->
     <v-list-item>
       <v-list-item-content class='main-title'>
