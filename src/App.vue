@@ -58,28 +58,14 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('goOnlineValue', (id, v1, v2, status) => {
-        console.log("main recv "+id+','+v1+','+v2+','+status)
-        if (status) {
-          switch(id) {
-            case 0:
-              //
-              break;
-            case 1:
-              ipcRenderer.send('tcpServerStart', v2)
-              break;
-          }
-        }
-        if (!status) {
-          switch(id) {
-            case 0:
-              //
-              break;
-            case 1:
-              ipcRenderer.send('tcpServerClose')
-              break;
-          }
-        }
+    this.$eventBus.$on('goOnlineValue', (id, ip, port, status) => {
+      let obj ={};
+      obj["protocol"] = id
+      obj["ip"] = ip
+      obj["port"] = port
+      obj["status"] = status
+      console.log(obj)
+      ipcRenderer.send('OnConnect', JSON.stringify(obj))        
     }),
     this.$eventBus.$on('snackBarAct', text => {
       this.snackbarOpen(text, "error")
@@ -91,7 +77,6 @@ export default {
 
     ipcRenderer.on('onConnect', function(e, text) {
       console.log(text)
-      this.snackbarOpen(text, "primary")
       this.snackbar = true
     })
   },

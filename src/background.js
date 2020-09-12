@@ -110,12 +110,12 @@ const server = net.createServer (function (Client) {
 
   console.log('Client Connect: %s:%s',Client.remoteAddress, Client.remotePort);
 
-  // win.webContents.send('onConnect', Client.remoteAddress, Client.remotePort)
+  win.webContents.send('onConnect', Client.remoteAddress, Client.remotePort)
 
   Client.on('data', function (data) {
     console.log('Tcp Server Recv Data %d: %s', Client.remotePort,data.toString());
     // win.webContents.send('tcpServer', data)
-    // if (!data) return
+    if (!data) return
     connectedSocketClient.broadcast(data)
   })
   Client.on('close', function() {
@@ -128,7 +128,7 @@ server.on('error', function(err) {
   console.log('tcp server err = ' + err);
 })
 
-server.listen(59432, function() {
+server.listen(60000, function() {
   console.log('Server listening: '+ JSON.stringify(server.address()));
   server.on('close', function(){
     console.log("Server Close");
@@ -138,8 +138,8 @@ server.listen(59432, function() {
   })
 })
 
-ipcMain.on('onConnect', (event, arg) => {
+ipcMain.on('OnConnect', (event, arg) => {
   console.log(arg)
-  connectedSocketClient.broadcast("ok")
+  connectedSocketClient.broadcast(arg)
 
 })
