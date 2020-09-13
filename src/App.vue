@@ -10,7 +10,7 @@
     <site-menu/>
 
     <v-main>
-      <HelloWorld/>
+      <Main/>
     </v-main>
 
     <site-footer/>
@@ -36,7 +36,7 @@
 <script>
 const ipcRenderer = window.require('electron').ipcRenderer;
 import SiteMenu from './components/Menu';
-import HelloWorld from './components/HelloWorld';
+import Main from './components/Main';
 import SiteFooter from './components/Footer';
 
 export default {
@@ -44,7 +44,7 @@ export default {
 
   components: {
     SiteMenu,
-    HelloWorld,
+    Main,
     SiteFooter
   },
   data (){
@@ -71,13 +71,14 @@ export default {
       this.snackbarOpen(text, "error")
       this.snackbar = true
     }),
-    this.$eventBus.$on('sendString', text => {
-      console.log('main recv = '+text)
+    this.$eventBus.$on('sendString', msg => {
+      console.log('main recv = '+ msg)
+      ipcRenderer.send('sendMsg', msg)
+      this.$eventBus.$emit('addMsg', 'TCP Serv', 'This', msg)
     }),
-
-    ipcRenderer.on('onConnect', function(e, text) {
-      console.log(text)
-      this.snackbar = true
+    ipcRenderer.on('rtMsg', (e, id, from, msg) =>{
+      console.log('ondata')
+      this.$eventBus.$emit('addMsg', 'TCP Serv', 'This', msg)      
     })
   },
   methods: {
@@ -91,3 +92,7 @@ export default {
   }
 }
 </script>
+
+<style>
+
+</style>

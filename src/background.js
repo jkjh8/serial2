@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, Menu} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 // import { dgram } from 'dgram'
@@ -30,6 +30,7 @@ function createWindow() {
       nodeIntegration: true
     }
   })
+  // Menu.setApplicationMenu(null)
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -109,14 +110,15 @@ const server = net.createServer (function (Client) {
   connectedSocketClient.add(Client)
 
   console.log('Client Connect: %s:%s',Client.remoteAddress, Client.remotePort);
+  connectedSocketClient.broadcast('Client Connect: %s:%s',Client.remoteAddress, Client.remotePort)
 
   win.webContents.send('onConnect', Client.remoteAddress, Client.remotePort)
 
   Client.on('data', function (data) {
-    console.log('Tcp Server Recv Data %d: %s', Client.remotePort,data.toString());
-    // win.webContents.send('tcpServer', data)
+    // console.log('Tcp Server Recv Data %d: %s', Client.remotePort,data.toString());
     if (!data) return
-    connectedSocketClient.broadcast(data)
+    win.webContents.send('rtMsg', 'Tcp Serv','Remote', data.toString())
+    // connectedSocketClient.broadcast(data)
   })
   Client.on('close', function() {
     connectedSocketClient.delete(Client)
@@ -128,18 +130,44 @@ server.on('error', function(err) {
   console.log('tcp server err = ' + err);
 })
 
-server.listen(60000, function() {
-  console.log('Server listening: '+ JSON.stringify(server.address()));
-  server.on('close', function(){
-    console.log("Server Close");
+function tcpServer(port) {
+  server.listen(port, function() {
+    console.log('Server listening: '+ JSON.stringify(server.address()));
+    server.on('close', function(){
+      console.log("Server Close");
+    })
+    server.on('error', function(err){
+      console.log('Server Error: ',JSON.stringify(err));
+    })
   })
-  server.on('error', function(err){
-    console.log('Server Error: ',JSON.stringify(err));
-  })
+}
+
+
+ipcMain.on('OnConnect', (event, id, ip, port, value) => {
+  console.log('on')
+  switch(value) {
+    case true:
+      switch(id) {
+        case 0: 
+          //
+        break
+        case 1:
+          tcpServer(port)
+        }
+      break
+    case false:
+      switch(id) {
+        case 0:
+          //
+          break
+        case 1:
+          server.close()
+      }
+  }
 })
 
-ipcMain.on('OnConnect', (event, arg) => {
-  console.log(arg)
-  connectedSocketClient.broadcast(arg)
+ipcMain.on('sendMsg', (event, msg) => {
+  console.log('send out >>'+ msg)
+  connectedSocketClient.broadcast(msg)
 
 })

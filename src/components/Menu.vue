@@ -44,6 +44,7 @@
 </template>
 
 <script>
+const ipcRenderer = window.require('electron').ipcRenderer;
 let commValue = new Array(5);
 for (let i = 0;i< commValue.length; i++) {
   commValue[i] = new Array(2);
@@ -61,7 +62,7 @@ export default {
         }
       }
       else {
-        this.$eventBus.$emit('goOnlineValue', id, v1, v2, this.value)
+        ipcRenderer.send('OnConnect', id, v1, v2, this.value)
       }
     },
 

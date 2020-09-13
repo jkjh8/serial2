@@ -3,10 +3,10 @@
         <v-container>
             <v-row>
                 <v-col cols="10">
-                    <v-text-field class="footer-text" @change="keychange(value=$event)" hide-details dense></v-text-field>
+                    <v-text-field class="footer-text" @keyup.enter="sendtextevent()" v-model="sendtext" hide-details dense></v-text-field>
                 </v-col>
                 <v-col cols="2">
-                    <v-btn class="footer-btn" text>
+                    <v-btn class="footer-btn" @click="sendtextevent" text>
                         SEND
                     </v-btn>
                 </v-col>
@@ -17,10 +17,14 @@
 
 <script>
 export default {
+    data() {
+        return {
+            sendtext: '',
+        }
+    },
     methods: {
-        keychange: function (value) {
-            if (value === '') return
-            this.$eventBus.$emit('sendString',value)
+        sendtextevent: function () {
+            this.$eventBus.$emit('sendString',this.sendtext)
         }
     }
 }
