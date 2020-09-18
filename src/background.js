@@ -108,16 +108,13 @@ connectedSocketClient.broadcast = function (text, except) {
 // TCP Server
 const server = net.createServer (function (Client) {
   connectedSocketClient.add(Client)
-
-  console.log('Client Connect: %s:%s',Client.remoteAddress, Client.remotePort);
-  connectedSocketClient.broadcast('Client Connect: %s:%s',Client.remoteAddress, Client.remotePort)
-
   win.webContents.send('onConnect', Client.remoteAddress, Client.remotePort)
-
+  
   Client.on('data', function (data) {
     // console.log('Tcp Server Recv Data %d: %s', Client.remotePort,data.toString());
     if (!data) return
-    win.webContents.send('rtMsg', 'Tcp Serv','Remote', data.toString())
+    let address = (`${Client.remoteAddress}:${Client.remotePort}`)
+    win.webContents.send('rtMsg', 'Tcp Serv',address, data.toString())
     // connectedSocketClient.broadcast(data)
   })
   Client.on('close', function() {
@@ -133,13 +130,44 @@ server.on('error', function(err) {
 function tcpServer(port) {
   server.listen(port, function() {
     console.log('Server listening: '+ JSON.stringify(server.address()));
+    win.webContents.send('onlineState', 1, true)
     server.on('close', function(){
       console.log("Server Close");
+      win.webContents.send('onlineState', 1, false)
     })
     server.on('error', function(err){
       console.log('Server Error: ',JSON.stringify(err));
     })
   })
+}
+
+let TcpClient = '';
+
+const TcpClientConnect = function(ip, port) {
+  win.webContents.send('onlineState', 2, true)
+  TcpClient = net.connect({port:port, host:ip}, ()=>{
+    console.log('connected tcp clinet : '+ ip + ',' + port)
+  })
+  TcpClient.on('close', function() {
+    console.log('tcpclinet disconnected')
+    win.webContents.send('onlineState', 2, false)
+  })
+  TcpClient.on('data', function(data) {
+    console.log('Tcpclient recv = '+ data)
+    const address = ip+':'+port
+    win.webContents.send('rtMsg', 'Tcp Client',address, data.toString())
+  })
+  TcpClient.on('end', function() {
+    console.log('client end')
+  })
+  TcpClient.on('error', function(err) {
+    console.log('client Socket Error: '+ JSON.stringify(err));
+  })
+  return TcpClient
+}
+
+function TcpClientWrite(data) {
+  TcpClient.write(data)
 }
 
 
@@ -153,6 +181,9 @@ ipcMain.on('OnConnect', (event, id, ip, port, value) => {
         break
         case 1:
           tcpServer(port)
+        break
+        case 2:
+          TcpClientConnect(ip, port)
         }
       break
     case false:
@@ -161,7 +192,16 @@ ipcMain.on('OnConnect', (event, id, ip, port, value) => {
           //
           break
         case 1:
-          server.close()
+          for (let Clinet of connectedSocketClient) {
+            Clinet.destroy()             
+          }
+          server.close(function() {
+            server.unref()
+          })
+          break
+        case 2:
+          TcpClient.end()
+        break
       }
   }
 })
@@ -169,5 +209,7 @@ ipcMain.on('OnConnect', (event, id, ip, port, value) => {
 ipcMain.on('sendMsg', (event, msg) => {
   console.log('send out >>'+ msg)
   connectedSocketClient.broadcast(msg)
+  TcpClientWrite(msg)
 
 })
+

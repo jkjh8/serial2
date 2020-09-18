@@ -5,6 +5,10 @@
                 <template v-slot:item.createAt="{ item }">
                     {{ item.createAt.toLocaleString() }}
                 </template>
+                <template v-slot:item.msg="{ item }">
+                    <!-- {{ toHexString(item.msg) }} -->
+                    {{ item.msg }}
+                </template>
             </v-data-table>
         </v-card>
     </v-container>
@@ -31,27 +35,35 @@ export default {
     },
     mounted() {
         // this.list()
+
         console.log(this.items)
         this.$eventBus.$on('addMsg', (id, from, msg) => {
-            console.log('in start')
+            // console.log('in start')
             this.items.push({
                 createAt: new Date(),
                 protocol: id,
                 from: from,
                 msg: msg
             })
-            this.adddb()   
+            // this.adddb()   
         })
     },
     methods: {
-        async adddb () {
-            const d = await db.insert(this.items[0])
+        adddb () {
+            // console.log(this.items[0])
+            const d = db.insert(this.items[0])
+            // console.log(this.items[0])
             console.log(d)
             this.listdb()
         },
         listdb() {
             this.items = db.find()
             console.log(this.items)
+        },
+        toHexString(byteArray) {
+            return Array.from(byteArray, function(byte) {
+                return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+            }).join(',')
         }
     }
 }

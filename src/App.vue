@@ -38,6 +38,7 @@ const ipcRenderer = window.require('electron').ipcRenderer;
 import SiteMenu from './components/Menu';
 import Main from './components/Main';
 import SiteFooter from './components/Footer';
+let onlineState = [false, false, false, false, false]
 
 export default {
   name: 'App',
@@ -64,7 +65,6 @@ export default {
       obj["ip"] = ip
       obj["port"] = port
       obj["status"] = status
-      console.log(obj)
       ipcRenderer.send('OnConnect', JSON.stringify(obj))        
     }),
     this.$eventBus.$on('snackBarAct', text => {
@@ -77,8 +77,18 @@ export default {
       this.$eventBus.$emit('addMsg', 'TCP Serv', 'This', msg)
     }),
     ipcRenderer.on('rtMsg', (e, id, from, msg) =>{
-      console.log('ondata')
-      this.$eventBus.$emit('addMsg', 'TCP Serv', 'This', msg)      
+      this.$eventBus.$emit('addMsg', id, from, msg)      
+    })
+    ipcRenderer.on('onlineState', (e, id, value) => {
+      onlineState[id] = value;
+      for (let module of onlineState) {
+        console.log(module)
+        if (module === true) {
+          this.online = true
+          break
+        }
+        this.online = false
+      }
     })
   },
   methods: {

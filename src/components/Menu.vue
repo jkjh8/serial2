@@ -54,15 +54,16 @@ export default {
   props: ['onlineStatus'],
   methods: {
     goOnline: function (id) {
-      let v1 = commValue[id][0]; let v2 = commValue[id][1]
-      if (v1===''||v2===''||v1===undefined||v2===undefined||v1===null||v2===null) {
+      let protocol1 = commValue[id][0]; let protocol2 = commValue[id][1]
+      if (protocol1===''||protocol2===''||protocol1===undefined||
+            protocol2===undefined||protocol1===null||protocol2===null) {
         if (this.value === true) {
           this.$eventBus.$emit('snackBarAct', "error");
           this.items[id].value = false;
         }
       }
       else {
-        ipcRenderer.send('OnConnect', id, v1, v2, this.value)
+        ipcRenderer.send('OnConnect', id, protocol1, protocol2, this.value)
       }
     },
 
@@ -71,10 +72,6 @@ export default {
     mounted() {
       commValue[0][0] = 'COM1'
       commValue[0][1] = '9600'
-      this.$eventBus.$on('serialOnlineRt', (value) => {
-          this.items[0].online = value
-          // console.log(this.items[0])
-      }),
       this.$eventBus.$on('drawerMenu', () => {
         this.drawer = !this.drawer
       })
