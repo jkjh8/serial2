@@ -3,7 +3,7 @@
 import { app, protocol, BrowserWindow, ipcMain, Menu} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-// import { dgram } from 'dgram'
+const dgram = require('dgram');
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const net = require('net')
@@ -141,6 +141,7 @@ function tcpServer(port) {
   })
 }
 
+// TcpClient Module
 let TcpClient = '';
 
 const TcpClientConnect = function(ip, port) {
@@ -170,6 +171,50 @@ function TcpClientWrite(data) {
   TcpClient.write(data)
 }
 
+let UdpServer = dgram.createSocket('udp4')
+//UDP Server
+function UdpServerConnect(ip,port) {
+
+
+  UdpServer.on('error',(err) =>{
+    console.log(`server error:\n${err.stack}`)
+  });
+
+  UdpServer.on('message', (msg, rinfo) =>{
+    console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+    win.webContents.send('rtMsg', 'Udp Server', rinfo.address+":"+rinfo.port, msg.toString())
+  });
+
+  UdpServer.on('listening', () => {
+    const address = UdpServer.address();
+    console.log(`server listening ${address.address}:${address.port}`);
+    win.webContents.send('onlineState', 3, true)
+  });
+
+  UdpServer.on('close', () => {
+    console.log('UdpServer Close')
+    win.webContents.send('onlineState', 3, false)
+    UdpServer = null
+    UdpServer = dgram.createSocket('udp4')
+  })
+
+  UdpServer.bind(port,ip)
+  // UdpServer.close()
+}
+
+let UdpClinet = dgram.createSocket('udp4');
+
+function UdpSender (msg, ip, port) {
+  let message = new Buffer("ok send");
+  console.log(message)
+  UdpClinet.send(message, 0, message.length, port, ip, function(err, bytes){
+    if (err) throw err;
+    console.log('UDP msg send ${ip}:${port}')
+    // UdpClinet.close()
+  })
+}
+
+
 
 ipcMain.on('OnConnect', (event, id, ip, port, value) => {
   console.log('on')
@@ -184,6 +229,12 @@ ipcMain.on('OnConnect', (event, id, ip, port, value) => {
         break
         case 2:
           TcpClientConnect(ip, port)
+        break
+        case 3:
+          UdpServerConnect(ip, port)
+        break
+        case 4:
+          UdpSender('OK',ip,port)
         }
       break
     case false:
@@ -202,6 +253,8 @@ ipcMain.on('OnConnect', (event, id, ip, port, value) => {
         case 2:
           TcpClient.end()
         break
+        case 3:
+          UdpServer.close()
       }
   }
 })

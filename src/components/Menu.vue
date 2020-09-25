@@ -100,7 +100,7 @@ export default {
           items: [
             { 
               title: 'IP',
-              placeholder: 'localhost'
+              // value: 'localhost'
             },
             {
               title: 'PORT',
