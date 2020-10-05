@@ -24,11 +24,11 @@
         <!-- 서브 아이템 -->
         <v-list-item v-for="(subItem, j) in item.items" :key="j">
           <v-list-item-content v-if="i === 0">
-            <v-select :label="subItem.title" :items="subItem.items" :value="subItem.value" @change="changeValue(i,j,value=$event)" hide-details dense/>
+            <v-select :label="subItem.title" :items="subItem.items" :value="subItem.value" hide-details dense/>
           </v-list-item-content>
 
           <v-list-item-content v-else>
-            <v-text-field :label="subItem.title" v-model="subItem.model" :placeholder="subItem.placeholder" @change="changeValue(i,j,value=$event)" hide-details dense/>
+            <v-text-field :label="subItem.title" :value="subItem.value" :placeholder="subItem.placeholder" hide-details dense/>
           </v-list-item-content>
         </v-list-item>
 
@@ -45,37 +45,44 @@
 </template>
 
 <script>
-const ipcRenderer = window.require('electron').ipcRenderer;
-let commValue = new Array(5);
-for (let i = 0;i< commValue.length; i++) {
-  commValue[i] = new Array(2);
+// const ipcRenderer = window.require('electron').ipcRenderer;
+let viewSetupValue = {
+  showhex:false,
+  sendhex:false,
+  sendcrlf:false
 }
 
 export default {
   props: ['onlineStatus'],
   methods: {
-    goOnline: function (id) {
-      let protocol1 = commValue[id][0]; let protocol2 = commValue[id][1]
-      if (protocol1===''||protocol2===''||protocol1===undefined||
-            protocol2===undefined||protocol1===null||protocol2===null) {
-        if (this.value === true) {
-          this.$eventBus.$emit('snackBarAct', "error");
-          this.items[id].value = false;
-        }
-      }
-      else {
-        ipcRenderer.send('OnConnect', id, protocol1, protocol2, this.value)
-      }
-    },
-
-    changeValue: function(i,j,value) { commValue[i][j] = value; console.log(commValue);}
-  },
-    mounted() {
-      commValue[0][0] = 'COM1'
-      commValue[0][1] = '9600'
-      this.$eventBus.$on('drawerMenu', () => {
-        this.drawer = !this.drawer
-      })
+    goOnline: function (id, value) {
+      switch (id) {
+        case 5:
+          viewSetupValue.showhex = value
+          console.log(viewSetupValue)
+          break;
+        case 6:
+          viewSetupValue.sendhex = value
+          console.log(viewSetupValue)
+          break;
+        case 7:
+          viewSetupValue.sendcrlf = value
+          console.log(viewSetupValue)
+          break;
+        default:
+          this.connection(id, value)
+        } 
+      },
+      connection: function(id, value) {
+        const connect = {
+          protocol: id,
+          ip: this.items[id].items[0].value,
+          port: this.items[id].items[1].value,
+          state: value
+          }
+        console.log(connect)
+        // ipcRenderer.send('OnConnect', id, protocol1, protocol2, this.value)
+      },
     },
   data () {
     return {
@@ -101,7 +108,7 @@ export default {
           items: [
             { 
               title: 'IP',
-              // value: 'localhost'
+              value: '127.0.0.1'
             },
             {
               title: 'PORT',
@@ -132,7 +139,7 @@ export default {
           items: [
             { 
               title: 'IP',
-              placeholder: 'localhost',
+              value: '0.0.0.0',
             },
             {
               title: 'PORT',

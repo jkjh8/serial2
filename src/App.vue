@@ -1,10 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar app class="primary" dark flat height=49px>
+    <v-app-bar app class="primary" dark flat >
       <v-app-bar-nav-icon @click="drawer=!drawer"/>
       <v-spacer/>
-      <v-icon v-if="online" color="green">mdi-wifi</v-icon>
-      <v-icon v-else color="red">mdi-wifi-off</v-icon>
+      <!-- <v-chip-group>
+        <v-chip color="secondary" text-color="white" outlined>Show Acsii</v-chip>
+      </v-chip-group> -->
+      <v-avatar v-if="online" color="green" class="px-3 ">mdi-wifi</v-avatar>
+      <v-icon v-else color="red" class="px-3">mdi-wifi-off</v-icon>
     </v-app-bar>
 
     <v-navigation-drawer app v-model="drawer" fixed >
