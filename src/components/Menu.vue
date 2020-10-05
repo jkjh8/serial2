@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app v-model="drawer" fixed >
+  <div>
      <!-- 제목 -->
     <v-list-item>
       <v-list-item-content class='main-title'>
@@ -40,7 +40,7 @@
         </v-list-item>
       </v-list-group>
     </v-list>
-  </v-navigation-drawer>
+  </div>
 </template>
 
 <script>
@@ -154,8 +154,6 @@ export default {
           ],
         },
       ],
-      drawer: true,
-      mini: false,
     }
   },
 }

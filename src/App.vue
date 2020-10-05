@@ -1,42 +1,38 @@
 <template>
   <v-app>
     <v-app-bar app class="primary" dark flat height=49px>
-      <v-app-bar-nav-icon @click="drawer()"/>
+      <v-app-bar-nav-icon @click="drawer=!drawer"/>
       <v-spacer/>
       <v-icon v-if="online" color="green">mdi-wifi</v-icon>
       <v-icon v-else color="red">mdi-wifi-off</v-icon>
     </v-app-bar>
 
-    <site-menu/>
+    <v-navigation-drawer app v-model="drawer" fixed >
+      <site-menu/>
+    </v-navigation-drawer>
 
     <v-main>
-      <Main/>
+      <v-container>
+        <v-card>
+          <v-data-table :headers="headers" :items="items" :sort-by="sortby" :sort-desc="sortdesc" dense>
+              <template v-slot:item.createAt="{ item }">
+                {{ item.createAt.toLocaleString() }}
+              </template>
+              <!-- <template v-slot:item.msg="{ item }">
+                {{ item.msg }}
+              </template> -->
+          </v-data-table>
+        </v-card>
+      </v-container>
     </v-main>
 
     <site-footer/>
-
-    <v-snackbar :color="snackbarclass" v-model="snackbar" :timeout="timeout" rounded="pill" dark>
-      {{ snackbartext }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-
   </v-app>
 </template>
 
 <script>
 const ipcRenderer = window.require('electron').ipcRenderer;
 import SiteMenu from './components/Menu';
-import Main from './components/Main';
 import SiteFooter from './components/Footer';
 let onlineState = [false, false, false, false, false]
 
@@ -45,16 +41,21 @@ export default {
 
   components: {
     SiteMenu,
-    Main,
     SiteFooter
   },
   data (){
     return {
+      drawer: true,
       online: false,
-      snackbar: false,
-      snackbarclass: "primary",
-      snackbartext: '',
-      timeout: 3000
+      sortby: 'createAt',
+      sortdesc: true,
+      headers: [
+          {value:'createAt', text: '시간', width: '180px'},
+          {value:'protocol', text: '프로토콜', width: '100px'},
+          {value: 'from', text: '발신', width: '100px'},
+          {value: 'msg', text: '값'}
+      ],
+      items : [],
 
     }
   },
@@ -66,10 +67,6 @@ export default {
       obj["port"] = port
       obj["status"] = status
       ipcRenderer.send('OnConnect', JSON.stringify(obj))        
-    }),
-    this.$eventBus.$on('snackBarAct', text => {
-      this.snackbarOpen(text, "error")
-      this.snackbar = true
     }),
     this.$eventBus.$on('sendString', msg => {
       console.log('main recv = '+ msg)
@@ -92,13 +89,7 @@ export default {
     })
   },
   methods: {
-    drawer: function () {
-      this.$eventBus.$emit('drawerMenu')
-    },
-    snackbarOpen: function(text, putClassName) {
-      this.snackbarclass = putClassName
-      this.snackbartext = text
-    }
+    //
   }
 }
 </script>

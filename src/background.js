@@ -207,7 +207,7 @@ let UdpClinet = dgram.createSocket('udp4');
 function UdpSender (msg, ip, port) {
   let message = new Buffer("ok send");
   console.log(message)
-  UdpClinet.send(message, 0, message.length, port, ip, function(err, bytes){
+  UdpClinet.send(message, 0, message.length, port, ip, function(err){
     if (err) throw err;
     console.log('UDP msg send ${ip}:${port}')
     // UdpClinet.close()
