@@ -32,6 +32,7 @@ export default {
 </script>
 
 <style>
+  .footer-switch {height: 10px; margin: 0px; padding: 0px;}
   .footer-text {margin-left: 30px; margin-right: 0px; padding: 0px;}
   .footer-btn {margin-right: 30px; margin-left: 0px; padding: 0px;}
 </style>

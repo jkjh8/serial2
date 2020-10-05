@@ -34,7 +34,8 @@
 
         <!-- 온라인 버튼 -->
         <v-list-item>
-          <v-list-item-title>Online</v-list-item-title>
+          <v-list-item-title v-if="i<5" >Online</v-list-item-title>
+          <v-list-item-title v-else>On</v-list-item-title>
           <v-spacer/> 
           <v-switch :value="item.value" v-on:change="goOnline(i,value=$event)"></v-switch>
         </v-list-item>
@@ -153,6 +154,24 @@ export default {
             },
           ],
         },
+        {
+          title: 'Show Hex',
+          online: false,
+          value: false,
+          icon: 'mdi-code-array',
+        },
+        {
+          title: 'Send Hex',
+          online: false,
+          value: false,
+          icon: 'mdi-code-array',
+        },
+        {
+          title: 'Send CrLf',
+          online: false,
+          value: false,
+          icon: 'mdi-code-array',
+        }
       ],
     }
   },
