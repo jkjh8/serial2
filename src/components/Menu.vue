@@ -45,7 +45,7 @@
 </template>
 
 <script>
-// const ipcRenderer = window.require('electron').ipcRenderer;
+const ipcRenderer = window.require('electron').ipcRenderer;
 let viewSetupValue = {
   showhex:false,
   sendhex:false,
@@ -81,7 +81,8 @@ export default {
           state: value
           }
         console.log(connect)
-        // ipcRenderer.send('OnConnect', id, protocol1, protocol2, this.value)
+        // this.onlineStatusSend(connect)
+        ipcRenderer.send('OnConnect', connect)
       },
     },
   data () {

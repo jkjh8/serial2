@@ -11,7 +11,7 @@
     </v-app-bar>
 
     <v-navigation-drawer app v-model="drawer" fixed >
-      <site-menu/>
+      <site-menu />
     </v-navigation-drawer>
 
     <v-main>
@@ -34,10 +34,10 @@
 </template>
 
 <script>
-const ipcRenderer = window.require('electron').ipcRenderer;
+// const ipcRenderer = window.require('electron').ipcRenderer;
 import SiteMenu from './components/Menu';
 import SiteFooter from './components/Footer';
-let onlineState = [false, false, false, false, false]
+// let onlineState = [false, false, false, false, false]
 
 export default {
   name: 'App',
@@ -63,36 +63,12 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('goOnlineValue', (id, ip, port, status) => {
-      let obj ={};
-      obj["protocol"] = id
-      obj["ip"] = ip
-      obj["port"] = port
-      obj["status"] = status
-      ipcRenderer.send('OnConnect', JSON.stringify(obj))        
-    }),
-    this.$eventBus.$on('sendString', msg => {
-      console.log('main recv = '+ msg)
-      ipcRenderer.send('sendMsg', msg)
-      this.$eventBus.$emit('addMsg', 'TCP Serv', 'This', msg)
-    }),
-    ipcRenderer.on('rtMsg', (e, id, from, msg) =>{
-      this.$eventBus.$emit('addMsg', id, from, msg)      
-    })
-    ipcRenderer.on('onlineState', (e, id, value) => {
-      onlineState[id] = value;
-      for (let module of onlineState) {
-        console.log(module)
-        if (module === true) {
-          this.online = true
-          break
-        }
-        this.online = false
-      }
-    })
+    // ipcRenderer.on('rtMsg', (e, id, from, msg) =>{
+    //   this.$eventBus.$emit('addMsg', id, from, msg)      
+    // })
   },
   methods: {
-    //
+//
   }
 }
 </script>
