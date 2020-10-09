@@ -9,12 +9,9 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder:{
+      externals: ['serialport'],
       builderOptions: {
-        extraResources :{
-          "from": "./src/py/",
-          "to": "py",
-          "filter": ["**"]  
-        }
+        //
       }
     }
   }

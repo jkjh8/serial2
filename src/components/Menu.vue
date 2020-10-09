@@ -16,7 +16,7 @@
           <v-list-item-content>
             <v-list-item-title>
                 {{ item.title }}
-                <v-icon v-if='item.online' size=16 color='teal darken-2'>mdi-wifi</v-icon>
+                <v-icon v-show='item.online' size=16 color='teal darken-2'>mdi-wifi</v-icon>
             </v-list-item-title>                       
           </v-list-item-content>
         </template>
@@ -28,7 +28,7 @@
           </v-list-item-content>
 
           <v-list-item-content v-else>
-            <v-text-field :label="subItem.title" :value="subItem.value" :placeholder="subItem.placeholder" hide-details dense/>
+            <v-text-field :label="subItem.title" v-model="subItem.value" :placeholder="subItem.placeholder" hide-details dense/>
           </v-list-item-content>
         </v-list-item>
 
@@ -37,7 +37,7 @@
           <v-list-item-title v-if="i<5" >Online</v-list-item-title>
           <v-list-item-title v-else>On</v-list-item-title>
           <v-spacer/> 
-          <v-switch :value="item.value" v-on:change="goOnline(i,value=$event)"></v-switch>
+          <v-switch v-model="item.value" v-on:change="goOnline(i,value=$event)"></v-switch>
         </v-list-item>
       </v-list-group>
     </v-list>
@@ -47,27 +47,50 @@
 <script>
 const ipcRenderer = window.require('electron').ipcRenderer;
 let viewSetupValue = {
-  showhex:false,
-  sendhex:false,
-  sendcrlf:false
+  showHex:false,
+  sendHex:false,
+  sendCrLf:false
 }
 
 export default {
-  props: ['onlineStatus'],
+  created() {
+    ipcRenderer.on('onlineStatus',(e, status) => {
+      this.items[0].online = status.serial
+      this.items[1].online = status.tcpserver
+      this.items[2].online = status.tcpclient
+      this.items[3].online = status.udpserver
+      this.items[4].online = status.udpsender
+      if (status.serail === false) {
+        this.items[0].value = false
+      }
+      if (status.tcpserver === false) {
+        this.items[1].value = false
+      }
+      if (status.tcpclient === false) {
+        this.items[2].value = false
+      }
+      if (status.udpserver === false) {
+        this.items[3].value = false
+      }
+      if (status.udpserder === false) {
+        this.items[4].value = false
+      }
+    })
+  },
   methods: {
     goOnline: function (id, value) {
       switch (id) {
         case 5:
-          viewSetupValue.showhex = value
-          console.log(viewSetupValue)
+          viewSetupValue.showHex = value
+          ipcRenderer.send('viewSetup', viewSetupValue)
           break;
         case 6:
-          viewSetupValue.sendhex = value
-          console.log(viewSetupValue)
+          viewSetupValue.sendHex = value
+          ipcRenderer.send('viewSetup', viewSetupValue)
           break;
         case 7:
-          viewSetupValue.sendcrlf = value
-          console.log(viewSetupValue)
+          viewSetupValue.sendCrLf = value
+          ipcRenderer.send('viewSetup', viewSetupValue)
           break;
         default:
           this.connection(id, value)
@@ -81,7 +104,7 @@ export default {
           state: value
           }
         console.log(connect)
-        // this.onlineStatusSend(connect)
+        // this.onlineSend(connect)
         ipcRenderer.send('OnConnect', connect)
       },
     },
@@ -92,7 +115,7 @@ export default {
         {
           title: 'Serial',
           active: true,
-          online: false,
+          online: this.onlineSerial,
           value: false,
           icon: 'mdi-serial-port',
           items: [
@@ -113,6 +136,7 @@ export default {
             },
             {
               title: 'PORT',
+              value: ''
             },
           ],
         },

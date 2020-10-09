@@ -16,6 +16,7 @@
 </template>
 
 <script>
+const ipcRenderer = window.require('electron').ipcRenderer;
 export default {
     data() {
         return {
@@ -24,7 +25,8 @@ export default {
     },
     methods: {
         sendtextevent: function () {
-            this.$eventBus.$emit('sendString',this.sendtext)
+            console.log(this.sendtext)
+            ipcRenderer.send('sendMsg', this.sendtext)
         }
     }
 }
