@@ -1,9 +1,15 @@
 <template>
-    <v-footer app color="primary" dark>
+    <v-footer app color="blue-grey darken-2" dark>
         <v-container>
             <v-row>
                 <v-col cols="10">
-                    <v-text-field class="footer-text" @keyup.enter="sendtextevent()" v-model="sendtext" hide-details dense></v-text-field>
+                    <v-text-field 
+                    class="footer-text" 
+                    @keyup.enter="sendtextevent()"
+                    v-model="sendtext"
+                    hide-details
+                    dense>
+                    </v-text-field>
                 </v-col>
                 <v-col cols="2">
                     <v-btn class="footer-btn" @click="sendtextevent" text>

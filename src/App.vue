@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app class="primary" dark flat >
+    <v-app-bar app class="blue-grey darken-2" dark flat >
       <v-app-bar-nav-icon @click="drawer=!drawer"/>
       <v-spacer/>
       <!-- <v-chip-group>
