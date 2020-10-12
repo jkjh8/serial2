@@ -141,29 +141,37 @@ function serialPortConnent(com, baud) {
       buadrate: baud,
       // parser: serialport.parsers.readline('\n')
     })
+    onlineState.serial = true
+    win.webContents.send('onlineStatus', onlineState)
+
+    port.on('data', data => {
+      console.log(data)
+      writedb("Serial",com,data)
+    })
+
+    port.on('close', function(err) {
+      console.log('serialport Close', err)
+      onlineState.serial = false
+      win.webContents.send('onlineStatus', onlineState)
+    })
   } catch(err) {
     win.webContents.send('alert', JSON.stringify(err));
     onlineState.serial = false
     win.webContents.send('onlineStatus', onlineState)
   }
-
-  onlineState.serial = true
-  win.webContents.send('onlineStatus', onlineState)
-
-  port.on('data', data => {
-    console.log(data)
-    writedb("Serial",com,data)
-  })
-
-  port.on('close', function(err) {
-    console.log('serialport Close', err)
-    onlineState.serial = false
-    win.webContents.send('onlineStatus', onlineState)
-  })
 }
 
 serialPortConnent.disconnect = () => {
-  port.close();
+  try {
+    port.close()
+    onlineState.serial = false
+    win.webContents.send('onlineStatus', onlineState)
+  } catch(err) {
+    win.webContents.send('alert', JSON.stringify(err));
+    onlineState.serial = false
+    win.webContents.send('onlineStatus', onlineState)
+  }
+  
 }
 
 function serialWrite(data) {
